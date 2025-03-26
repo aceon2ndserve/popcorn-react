@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import StarRating from "./StarRating";
 
-const average = (arr) =>
-  arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 0);
+const average = (arr) => {
+  if (!arr) return 0;
+  return arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 0);
+};
 const KEY = "16cbc05f";
 export default function App() {
   const [movies, setMovies] = useState([]);
@@ -13,7 +15,7 @@ export default function App() {
   const [selectedId, setSelectedId] = useState(null);
   const [watched, setWatched] = useState(function () {
     const storedValue = localStorage.getItem("watched");
-    return JSON.parse(storedValue);
+    return JSON.parse(storedValue) || [];
   });
 
   function handleSelectMovie(id) {
@@ -222,8 +224,8 @@ function MovieDetails({ selectedId, onCloseMovie, onAddWatched, watched }) {
     },
     [userRating]
   );
-  const isWatched = watched.map((movie) => movie.imdbID).includes(selectedId);
-  const watchedUserRating = watched.find(
+  const isWatched = watched?.map((movie) => movie.imdbID).includes(selectedId);
+  const watchedUserRating = watched?.find(
     (movie) => movie.imdbID === selectedId
   )?.userRating;
   const {
@@ -348,16 +350,16 @@ function MovieDetails({ selectedId, onCloseMovie, onAddWatched, watched }) {
   );
 }
 function Summary({ watched }) {
-  const avgImdbRating = average(watched.map((movie) => movie.imdbRating));
-  const avgUserRating = average(watched.map((movie) => movie.userRating));
-  const avgRuntime = average(watched.map((movie) => movie.runtime));
+  const avgImdbRating = average(watched?.map((movie) => movie.imdbRating));
+  const avgUserRating = average(watched?.map((movie) => movie.userRating));
+  const avgRuntime = average(watched?.map((movie) => movie.runtime));
   return (
     <div className="summary">
       <h2>Movies you watched</h2>
       <div>
         <p>
           <span>#️⃣</span>
-          <span>{watched.length} movies</span>
+          <span>{watched?.length} movies</span>
         </p>
         <p>
           <span>⭐️</span>
@@ -378,7 +380,7 @@ function Summary({ watched }) {
 function WatchedList({ watched, onDeleteWatched }) {
   return (
     <ul className="list">
-      {watched.map((movie) => (
+      {watched?.map((movie) => (
         <WatchedMovie
           movie={movie}
           key={movie.imdbID}
